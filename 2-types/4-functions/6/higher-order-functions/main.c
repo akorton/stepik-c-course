@@ -21,32 +21,69 @@
 
 
 /* Запустить функцию f на каждом элементе списка  */
-void list_foreach(??? * l, void (f)(int64_t)) {
-  ???
+void list_foreach(const struct list* l, void (f)(int64_t)) {
+	while (l){
+		f(l->value);
+		l = l->next;
+	}
 }
 
 
 
 /* Изменить каждый элемент списка с помощью функции f  */
-void list_map_mut( ??? * l, int64_t (f) (int64_t)) {
-  ???
+void list_map_mut(struct list* l, int64_t (f) (int64_t)) {
+	while (l){
+		l->value = f(l->value);
+		l = l->next;
+	}
 }
 
 /*  Создать новый список, в котором каждый элемент получен из соответствующего
  элемента списка l путём применения функции f */
-struct list* list_map( ??? * l, int64_t (f) (int64_t)) {
-  ???
+struct list* list_map( const struct list* l, int64_t (f) (int64_t)) {
+	struct list* new_start_node = NULL;
+	struct list* new_cur_node = NULL;
+	while (l) {
+		struct list* new_node = node_create(f(l->value));
+		if (!new_start_node){
+			new_start_node = new_node;
+			new_cur_node = new_node;
+		} else {
+			new_cur_node->next = new_node;
+			new_cur_node = new_cur_node->next;
+		}
+		l = l->next;
+	}
+	return new_start_node;
 }
 
 /* Свернуть список l с помощью функции f. */
-int64_t list_fold(???* l, int64_t init, int64_t (f)(int64_t, int64_t)) {
-  ???
+int64_t list_fold( const struct list* l, int64_t init, int64_t (f)(int64_t, int64_t)) {
+	while (l) {
+		init = f(init, l->value);
+		l = l->next;
+	}
+	return init;
 }
 
 /*  Сгенерировать список длины sz с помощью значения init и функции f
  Результат: init, f(init), f(f(init)), ... */
-struct list* list_iterate( int64_t init, size_t sz, ??? f ) {
-  ???
+struct list* list_iterate( int64_t init, size_t sz, int64_t (f)(int64_t) ) {
+	struct list* start_node = NULL;
+	struct list* cur_node = NULL;
+	while (sz > 0){
+		struct list* new_node = node_create(init);
+		if (!start_node) {
+			start_node = new_node;
+			cur_node = new_node;
+		} else {
+			cur_node->next = new_node;
+			cur_node = cur_node->next;
+		}
+		init = f(init);
+		sz--;
+	}
+	return start_node;
 }
 
 
